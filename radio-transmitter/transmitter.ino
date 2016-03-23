@@ -4,7 +4,8 @@
 /* Hardware configuration: Set up nRF24L01 radio on SPI bus plus pins 7 & 8 */
 RF24 radio(7,8);
 byte addresses[][6] = {"1Node","2Node"};
-long long packet_count = 0;
+const uint64_t receiverAddress = 0xABCDABCD71LL; 
+int packet_count = 0;
 /* Packet count keeps track of the number of packets sent across.
  * The current system will expect an ack for every 100 (?) sent across.
  * This is a simple way to know weather the connection is still alive or not.
@@ -17,19 +18,24 @@ void setup()
         Serial.begin(115200);
         radio.begin();
 
+        // SetRetries(Delay before resending, Attemps before giving up)
+        radio.setRetries(15,15);
+
+        //Caliberate?
+        radio.startListening();
+        radio.stopListening();
         /*
          *  Setting to low to overcome power supply related issues. Also since there's
          *  likelihood of close proximity of the devices. RF24_PA_MAX is default.
          */
-        radio.setPALevel(RF24_PA_LOW);
-
-        // Open a writing and reading pipe on each radio, with opposite addresses
-
-        radio.openWritingPipe(addresses[1]);
-        radio.openReadingPipe(1,addresses[0]); //Do we need this crap?
+        radio.setPALevel(RF24_PA_MAX);
+        radio.setChannel(0x4c);
 
         // Start the radio listening for data for connect information
-        radio.startListening();
+        radio.stopListening();
+        
+        // Open a writing and reading pipe on each radio, with opposite addresses
+        radio.openWritingPipe(receiverAddress);        
 }
 
 void loop()
@@ -47,8 +53,8 @@ void loop()
          * will then be sent continuously.
          */
         if(Serial.available()){
-                cont_sig = Serial.readString()
-                        }
+                cont_sig = Serial.readString();
+        }
 
         cont_sig.toCharArray(msg, sizeof(cont_sig));
 
@@ -57,41 +63,15 @@ void loop()
          */
         radio.stopListening();
 
-        if (!radio.write( &msg, sizeof(*msg))){
-                Serial.println(F("failed"));
+        if (!radio.write( &msg, sizeof(msg))){
+                Serial.println(F("failed to send"));
+        } else {
+                Serial.println("Success");
         }
 
         packet_count++;
+        Serial.println(packet_count);
 
-        //For every 100 packets sent, expect ack
-        if (packet_count % 100) {
-                radio.startListening();
-
-                /* Start a simple timer that will begin when we first send a packet.
-                 * Can be used to measure a time out for ack messages.
-                 */
-                unsigned long start_time = millis();
-
-                //Bool variable to denote timeout or not
-                boolean timeout = false;
-
-                /* After we have sent a packet across, keep measuring time
-                 * till ack is recieved. If time out occurs, that is, no ack
-                 * for two seconds, report failure and CONTINUE SENDING packets.
-                 * User can then diagnose appropriately.
-                 */
-                while ( ! radio.available() ){
-                        if (millis() - start_time > 200000 ){
-                                timeout = true;
-                                break;
-                        }
-                }
-
-                if ( timeout ){
-                        Serial.println(F("Failed, response timed out."));
-                }
-        }
-
-        // In slutty airy voice : "This number is not available now. Please try again later"
+        
         delay(1000);
 }

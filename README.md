@@ -1,6 +1,6 @@
-Using RF24 libraries to implement a simple program on 
+Using mlsorensen's RF24 libraries to implement a simple program on 
 Beaglebone Black, placed on the quadcopter, to act a simple reciever.
-Using JeeLibs Libraries by JeeLabs to implement a simple C Program
+Using mlsorensen's RF24 library to implement a simple C Program
 on the Ardiuino Controller to act as a radio transmitter for the Quadcopter.
 
 The Radio Tranceiver is an nRF24L01 IC. The range is about 100m. The range can
@@ -24,7 +24,6 @@ orientation and throttle set points. This will be reciever by the BBB on the
 Quadcopter. The BBB will respond to any changes in incoming data. 
 The BBB will respond at frequent intervals to denote an active connection.
 
+Find the libraries here: https://github.com/mlsorensen/RF24
+Don't forget to read their Docs at, http://maniacbug.github.io/RF24/index.html
 
-
-Airspayce RadioHead: http://www.airspayce.com/mikem/arduino/RadioHead/index.html
-PyBBIO: https://github.com/graycatlabs/PyBBIO
