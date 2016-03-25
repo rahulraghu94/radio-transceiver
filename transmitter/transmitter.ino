@@ -65,9 +65,9 @@ void loop()
         radio.stopListening();
 
         if (!radio.write( &msg, sizeof(msg))){
-                Serial.println(F("failed to send"));
+                Serial.print(F("Failed to send: ")); Serial.println(msg);
         } else {
-                Serial.println("Success");
+                Serial.print("Success: "); Serial.println(msg);
         }
 
         packet_count++;
