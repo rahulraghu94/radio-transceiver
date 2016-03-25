@@ -13,6 +13,13 @@ int packet_count = 0;
  * time out and report weather connection is alive or not.
  */
 
+//Control signal with throttle roll, pitch and yaw values with $ delimiter
+String cont_sig = "t0 r0 p0 y0$";
+
+//Convert sont_sig string to char array to send across
+char *msg;
+
+
 void setup()
 {
         Serial.begin(115200);
@@ -40,12 +47,6 @@ void setup()
 
 void loop()
 {
-        //Control signal with throttle roll, pitch and yaw values with $ delimiter
-        String cont_sig = "t0 r0 p0 y0$";
-
-        //Convert sont_sig string to char array to send across
-        char *msg;
-
         /*
          * Program will continue sending 0 values till new values entered
          * from serial. When datat from stdIO is avalable, read them in as
